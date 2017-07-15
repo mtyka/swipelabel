@@ -10,10 +10,19 @@ PATH = "images/"
 LOGFILE = "logfile.log"
 
 # Load image list
-images = [PATH + x for x in os.listdir(PATH)]
+raw_images = os.listdir(PATH)
+images = []
+proc_images = []
 next_image = 0
 
-# Open logfile
+## read logfile, filter out already-processed images
+with open(LOGFILE, "r") as logfile :
+  logs = logfile.read() 
+  for raw in raw_images:
+    if raw in logs: proc_images.append(PATH + raw)
+    else: images.append(PATH + raw)
+
+# Open logfile in append mode
 logfile = open(LOGFILE, "a", 0)
 
 # Custom static data
@@ -30,6 +39,7 @@ def get_image():
     logfile.write(str(datetime.datetime.now()) + " ")
     logfile.write(os.path.basename(log))
     logfile.write("\n");
+    next_image += 1
 
   image_index = request.args.get('image_index')
   if image_index:
@@ -37,7 +47,6 @@ def get_image():
   else:
     global next_image
     current_image = images[next_image]
-    next_image += 1
 
   # Render a new image:
   return render_template('index.html', image=current_image, image_index=image_index)
