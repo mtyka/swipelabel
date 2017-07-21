@@ -10,7 +10,17 @@ PATH = "images/"
 LOGFILE = "logfile.log"
 
 # Load image list
-images = [PATH + x for x in os.listdir(PATH)]
+raw_images = os.listdir(PATH)
+images = []
+
+# read logfile, filter out already-processed images
+with open(LOGFILE, "r") as logfile :
+  logs = logfile.read()
+  images = [PATH + x for x in raw_images if x not in logs]
+  proc_images = [PATH + x for x in raw_images if x in logs]
+
+print "processed: ", proc_images
+
 next_image = 0
 
 # Open logfile
